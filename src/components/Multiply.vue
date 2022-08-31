@@ -71,7 +71,8 @@ const restart = () => {
 }
 
 .victory img {
-  width: 100vw;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -101,7 +102,7 @@ const restart = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 1rem;
   position: relative;
 }
 

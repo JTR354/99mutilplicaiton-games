@@ -45,7 +45,7 @@ const toggle = () => {
 }
 
 .logo {
-  height: 26rem;
+  height: 16em;
   padding: 1.5em;
   will-change: filter;
   cursor: pointer;
