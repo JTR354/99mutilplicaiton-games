@@ -12,7 +12,7 @@ const toggle = () => {
 </script>
 
 <template>
-  <div class="app">
+  <div v-if="!visible" class="app">
     <img src="/vite.svg" class="logo" alt="Vite logo" @click="toggle" />
     <!-- <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" /> -->
     <h1>Let's go</h1>

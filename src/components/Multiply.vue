@@ -5,9 +5,20 @@
       <h1>×</h1>
       <h1>{{ state.qa[1] }}</h1>
       <h1>=</h1>
-      <input class="answer" @focus="handleFocus" :class="{ error: state.isError }" type="tel" v-model="answer"
-        :autocomplete="false" maxlength="2" @blur="submit" autofocus @keyup.enter="submit">
-      <span class="score">分数: {{ score }}</span>
+      <input
+        class="answer"
+        @focus="handleFocus"
+        :class="{ error: state.isError }"
+        type="tel"
+        :value="answer"
+        @input="handleChange"
+        :autocomplete="false"
+        maxlength="2"
+        @blur="submit"
+        autofocus
+        @keyup.enter="submit"
+      />
+      <!-- <span class="score">分数: {{ score }}</span> -->
     </div>
     <Transition>
       <section v-if="score >= 10" class="victory" @click="restart">
@@ -18,42 +29,58 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from "vue";
 function createNumber() {
-  return 10 - Math.max(((Math.random() * 100) % 10) >> 0, 1)
+  return Math.max((Math.random() * 100) % 10 >> 0, 2);
 }
 function createQa() {
-  return [createNumber(), createNumber()]
+  return [createNumber(), createNumber()];
 }
-const answer = ref('')
-const score = ref(0)
-const state = reactive({ qa: createQa(), isError: false })
+const answer = ref("");
+const score = ref(0);
+const state = reactive({ qa: createQa(), isError: false });
+function setTitle(score = 0) {
+  document.title = `得分: ${score}`;
+}
+onMounted(() => {
+  setTitle();
+});
+let lock = false;
 const submit = (e) => {
-  const value = answer.value
-  if (value) {
-    const [one, two] = state.qa
-    const result = confirm(`${one}×${two}=${value}？`)
-    if (result) {
-      const isTrue = one * two === +value
-      if (isTrue) {
-        state.qa = createQa()
-        answer.value = ''
-        score.value++
-      }
-      state.isError = !isTrue
-    }
-
+  if (lock) {
+    setTimeout(() => {
+      lock = false;
+    }, 100);
+    return;
   }
-}
-
-const handleFocus = e => {
-  e.target.select()
-}
+  lock = true;
+  const value = answer.value;
+  if (value) {
+    const [one, two] = state.qa;
+    const result = confirm(`${one}×${two}=${value}？`);
+    if (result) {
+      const isTrue = one * two === +value;
+      if (isTrue) {
+        state.qa = createQa();
+        answer.value = "";
+        score.value++;
+        setTitle(score.value);
+      }
+      state.isError = !isTrue;
+    }
+  }
+};
+const handleChange = (e) => {
+  answer.value = e.target.value;
+  state.isError = false;
+};
+const handleFocus = (e) => {
+  e.target.select();
+};
 
 const restart = () => {
-  confirm('再来一局?') && location.reload()
-}
-
+  confirm("再来一局?") && location.reload();
+};
 </script>
 
 <style scoped>
@@ -64,7 +91,6 @@ const restart = () => {
   width: 100vw;
   height: 100vh;
   box-sizing: border-box;
-  z-index: 3;
   display: flex;
   align-items: center;
   justify-items: center;
@@ -92,24 +118,32 @@ const restart = () => {
   width: 1.5em;
   border: none;
   outline: 1px solid skyblue;
-
+  /* color: #333; */
 }
 
 .card {
   width: 50%;
   height: 50%;
-  box-shadow: 0 0 12px rgba(0, 0, 0, .12);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   position: relative;
+  padding: 3rem;
+  /* color: #333; */
+}
+
+.card input {
+  background: transparent;
 }
 
 .score {
-  position: absolute;
-  top: 0.5em;
-  color: blue;
+  position: fixed;
+  bottom: 0.5em;
+  color: red;
+  font-size: 2em;
+  font-weight: bold;
 }
 
 .multiply {
@@ -120,7 +154,8 @@ const restart = () => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #213547;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,5 +170,18 @@ const restart = () => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .multiply {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
 }
 </style>
