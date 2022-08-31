@@ -60,10 +60,10 @@ onMounted(() => {
 });
 let lock = false;
 const submit = (e) => {
+  setTimeout(() => {
+    lock = false;
+  }, 100);
   if (lock) {
-    setTimeout(() => {
-      lock = false;
-    }, 100);
     return;
   }
   lock = true;
