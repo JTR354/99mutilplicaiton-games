@@ -29,12 +29,25 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, onUnmounted } from "vue";
+let cache = new Set();
+onUnmounted(() => {
+  cache.clear();
+  cache = null;
+});
 function createNumber() {
   return Math.max((Math.random() * 100) % 10 >> 0, 2);
 }
-function createQa() {
-  return [createNumber(), createNumber()];
+function createQa(level = 0) {
+  const result = [createNumber(), createNumber()];
+  if (
+    (level < 10 && cache.has(result.toString())) ||
+    cache.has([...result].reverse().toString())
+  ) {
+    return createQa(level + 1);
+  }
+  cache.add(result.toString());
+  return result;
 }
 const answer = ref("");
 const score = ref(0);
